@@ -5,6 +5,7 @@ import {
   pasteFromClipboard,
   processAndSortSkbText,
 } from "./utils/string";
+import { getIsSafari } from "./utils/browser";
 
 function App() {
   const [text, setText] = useState("");
@@ -40,17 +41,20 @@ function App() {
             <i className="fa-solid fa-broom mr-1"></i>
             Clear
           </button>
-          <button
-            className="w-full py-2 mt-2 bg-[var(--salmon-pink)] text-[var(--dark-red)] hover:text-white font-bold hover:bg-[var(--orange-red)] transition-all"
-            onClick={() => {
-              pasteFromClipboard().then((res) => {
-                setText(res ?? "");
-              });
-            }}
-          >
-            <i className="fa-solid fa-paste mr-1"></i>
-            Paste
-          </button>
+
+          {!getIsSafari() && (
+            <button
+              className="w-full py-2 mt-2 bg-[var(--salmon-pink)] text-[var(--dark-red)] hover:text-white font-bold hover:bg-[var(--orange-red)] transition-all"
+              onClick={() => {
+                pasteFromClipboard().then((res) => {
+                  setText(res ?? "");
+                });
+              }}
+            >
+              <i className="fa-solid fa-paste mr-1"></i>
+              Paste
+            </button>
+          )}
         </div>
 
         <button
