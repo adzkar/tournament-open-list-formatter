@@ -99,6 +99,9 @@ export type SkbParticipant = {
   hasVideo: boolean; // 🎥
   hasStar: boolean; // contains '*'
   isPartnerPlaceholder: boolean; // e.g., " / partner" or "/partner"
+  leftName?: string;
+  rightName?: string;
+  community?: string;
 };
 
 function parseParticipantContent(content: string): SkbParticipant {
@@ -110,6 +113,20 @@ function parseParticipantContent(content: string): SkbParticipant {
   const isPartnerPlaceholder =
     /\b\/\s*partner\b/i.test(c) || /\bpartner\b\s*\/?$/i.test(c);
 
+  // Remove markers and trailing star-notes for parsing names/community
+  const stripped = c
+    .replace(/[✅💯🎥]/gu, "")
+    .replace(/\*.*$/, "")
+    .trim();
+
+  // Try to extract names and optional community in parentheses
+  // e.g., "Adhitriya / Aziz N (badmintul)"
+  const m = stripped.match(/^(.+?)\s*\/\s*(.+?)(?:\s*\(([^)]+)\))?\s*$/);
+
+  const leftName = m ? m[1].trim() : undefined;
+  const rightName = m ? m[2].trim() : undefined;
+  const community = m ? (m[3] ? m[3].trim() : undefined) : undefined;
+
   return {
     original: c,
     hasCheck,
@@ -117,6 +134,9 @@ function parseParticipantContent(content: string): SkbParticipant {
     hasVideo,
     hasStar,
     isPartnerPlaceholder,
+    leftName,
+    rightName,
+    community,
   };
 }
 
@@ -162,6 +182,27 @@ export function sortSkbMainParticipants(main: string): string {
     const pa = participantPriority(a.p);
     const pb = participantPriority(b.p);
     if (pa !== pb) return pa - pb;
+    // Sort by community (A-Z, empty last)
+    const communityKey = (p: SkbParticipant) => {
+      const c = (p.community || "").trim().toLowerCase();
+      return c.length ? c : "\uFFFF";
+    };
+    const nameKey = (s?: string) => (s || "").trim().toLowerCase();
+
+    const ca = communityKey(a.p);
+    const cb = communityKey(b.p);
+    if (ca !== cb) return ca < cb ? -1 : 1;
+
+    // Then by left player name (A-Z)
+    const la = nameKey(a.p.leftName);
+    const lb = nameKey(b.p.leftName);
+    if (la !== lb) return la < lb ? -1 : 1;
+
+    // Then by right player name (A-Z)
+    const ra = nameKey(a.p.rightName);
+    const rb = nameKey(b.p.rightName);
+    if (ra !== rb) return ra < rb ? -1 : 1;
+
     // stable within the same bucket: preserve original order
     return a.idx - b.idx;
   });
