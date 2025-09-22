@@ -18,11 +18,11 @@ function App() {
   return (
     <div className={`bg-[var(--white)] min-h-screen`}>
       <div className="py-4 flex flex-col sm:max-w-[600px] w-[90%] mx-auto">
-        <div className="text-2xl font-bold mb-4 text-center">
+        <div className="text-2xl font-bold mb-4 text-center text-[var(--dark-red)]">
           Turnamen SKB Open List Formatter
         </div>
         <textarea
-          className="w-full min-h-80 border-[1px] border-solid border-gray p-2"
+          className="w-full min-h-80 border-[1px] border-solid border-gray p-2 bg-white text-black"
           placeholder="Paste disini listnya"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -76,7 +76,7 @@ function App() {
             </button>
 
             <div
-              className="bg-[var(--pink-pale)] p-2 mt-6"
+              className="bg-[var(--pink-pale)] p-2 mt-6 text-black"
               style={{ whiteSpace: "pre-wrap" }}
             >
               {finalText}
