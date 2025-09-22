@@ -22,6 +22,19 @@ function App() {
         <div className="text-2xl font-bold mb-4 text-center text-[var(--dark-red)]">
           Turnamen SKB Open List Formatter
         </div>
+
+        <div className="text-left text-sm text-gray-500 mb-4">
+          Cara penggunaan:
+          <ul className="list-decimal list-inside">
+            <li>Paste teks list peserta dari halaman list di Turnamen SKB.</li>
+            <li>
+              Klik tombol <b>Process</b>.
+            </li>
+            <li>Teks sudah terformat sesuai dengan aturan Turnamen SKB.</li>
+            <li>Copy teks yang sudah terformat</li>
+          </ul>
+        </div>
+
         <textarea
           className="w-full min-h-80 border-[1px] border-solid border-gray p-2 bg-white text-black"
           placeholder="Paste disini listnya"
