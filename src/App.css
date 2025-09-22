@@ -1,0 +1,12 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --orange-red: #ff4d4d;
+  --dark-red: #b33636;
+  --pink-pale: #ffd3d3;
+  --salmon-pink: #ffa6a6;
+  --white: #ffffff;
+}
