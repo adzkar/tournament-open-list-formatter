@@ -44,7 +44,7 @@ function App() {
             className="w-full py-2 mt-2 bg-[var(--salmon-pink)] text-[var(--dark-red)] hover:text-white font-bold hover:bg-[var(--orange-red)] transition-all"
             onClick={() => {
               pasteFromClipboard().then((res) => {
-                setText(res);
+                setText(res ?? "");
               });
             }}
           >
