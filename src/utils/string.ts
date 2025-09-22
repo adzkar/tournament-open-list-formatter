@@ -1,16 +1,68 @@
 /**  Copy given text to clipboard */
 export function copyToClipboard(text: string): void {
-  void navigator.clipboard.writeText(text).then(() => {
-    window.alert("text berhasil tersalin!");
-  });
+  // Try modern Clipboard API first; fallback for Safari/iOS when blocked or unavailable.
+  void (async () => {
+    try {
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
+        await navigator.clipboard.writeText(text);
+        window.alert("text berhasil tersalin!");
+        return;
+      }
+    } catch {
+      // Ignore and try legacy path below
+    }
+
+    // Legacy fallback: hidden textarea + document.execCommand('copy')
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; // prevent scroll jumps on iOS
+      ta.style.top = "-1000px";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length); // iOS requires explicit range
+
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+
+      if (ok) {
+        window.alert("text berhasil tersalin!");
+        return;
+      }
+      throw new Error("execCommand copy failed");
+    } catch {
+      window.alert(
+        "Gagal menyalin. Silakan pilih teks dan salin secara manual."
+      );
+    }
+  })();
 }
 
 /**  Paste text from clipboard */
 export function pasteFromClipboard() {
-  return navigator.clipboard.readText().then((text: string) => {
-    window.alert("text berhasil ditempel!");
-    return text;
-  });
+  // Prefer modern Clipboard API when available and permitted.
+  // On iOS Safari/Brave, readText may be unavailable or require a direct user gesture.
+  return (async () => {
+    try {
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.readText === "function"
+      ) {
+        const text = await navigator.clipboard.readText();
+        window.alert("text berhasil ditempel!");
+        return text;
+      }
+    } catch {
+      // fall through to manual paste overlay below
+    }
+  })();
 }
 
 /** Split input into header, main (participant list), and footer.
