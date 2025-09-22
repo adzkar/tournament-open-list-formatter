@@ -27,8 +27,10 @@ export function splitSkbTextSections(text: string): {
   // Normalize line endings and trim trailing spaces while keeping original content
   const normalize = (s: string) =>
     s
-      // remove zero-width and unusual joiners that might appear from copy-paste
-      .replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, "")
+      // remove some zero-width/control characters that may appear from copy-paste,
+      // but KEEP Zero Width Joiner (U+200D) and emoji variation selector (U+FE0F)
+      // to avoid breaking emoji sequences like "🧑‍🤝‍🧑"
+      .replace(/[\u200B\u200C\u200E\u200F\u202A-\u202E\u2060]/g, "")
       .replace(/\r\n?/g, "\n");
 
   const src = normalize(text);

@@ -69,13 +69,18 @@ function App() {
             <button
               className={`"w-full py-2 mt-2 bg-[var(--dark-red)] text-white font-bold hover:bg-[var(--orange-red)] transition-all mb-4 ${text.length === 0 ? "opacity-70 cursor-not-allowed" : ""}`}
               disabled={text.length === 0}
-              onClick={() => copyToClipboard(text)}
+              onClick={() => copyToClipboard(finalText)}
             >
               <i className="fa-solid fa-copy mr-1"></i>
               Copy
             </button>
 
-            <div className={`bg-[var(--pink-pale)] p-2 mt-6`}>{finalText}</div>
+            <div
+              className="bg-[var(--pink-pale)] p-2 mt-6"
+              style={{ whiteSpace: "pre-wrap" }}
+            >
+              {finalText}
+            </div>
           </>
         )}
       </div>
