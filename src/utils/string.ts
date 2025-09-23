@@ -267,6 +267,7 @@ export function sortSkbMainParticipants(main: string): string {
 /** High-level helper: split -> sort participants in main -> merge back */
 export function processAndSortSkbText(text: string): string {
   const { header, main, footer } = splitSkbTextSections(text);
+
   const sortedMain = sortSkbMainParticipants(main);
   const parts = [] as string[];
   if (header.trim().length) parts.push(header.trim());

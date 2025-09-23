@@ -35,6 +35,39 @@ function App() {
           </ul>
         </div>
 
+        <details className="text-left text-sm text-gray-500 mb-2">
+          <summary className="font-bold cursor-pointer">
+            Aturan sorting yang digunakan:
+          </summary>
+          <div className="mt-2">
+            <ul className="list-decimal list-inside">
+              <li>
+                Pertama, diurutkan berdasarkan emoji yang digunakan. Untuk
+                konsistensi, emoji yang digunakan adalah:
+                <ul className="list-disc list-inside pl-4">
+                  <li>✅ 💯 memiliki checklist & acc</li>
+                  <li>💯 memiliki acc</li>
+                  <li>🎥 memiliki video</li>
+                  <li>tanpa emoji</li>
+                  <li>pemain tanpa partner</li>
+                  <li>pemain yang diberi tanda bintang</li>
+                </ul>
+              </li>
+              <li>Setelah itu dikelompokan berdasarkan nama komunitas</li>
+              <li>
+                Di setiap nama komunitas yang sudah ada, diurutkan berdasarkan
+                nama pemain. Contoh:
+                <ul className="list-disc list-inside pl-4">
+                  <li>A / A (nama komunitas)</li>
+                  <li>A / B (nama komunitas)</li>
+                  <li>B / A (nama komunitas)</li>
+                  <li>B / B (nama komunitas)</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </details>
+
         <textarea
           className="w-full min-h-80 border-[1px] border-solid border-gray p-2 bg-white text-black"
           placeholder="Paste disini listnya"
