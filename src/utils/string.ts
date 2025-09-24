@@ -148,6 +148,7 @@ export type SkbParticipant = {
   original: string; // content without leading numbering
   hasCheck: boolean; // ✅
   hasAcc: boolean; // 💯
+  hasMoney: boolean; // 💰
   hasVideo: boolean; // 🎥
   hasStar: boolean; // contains '*'
   isPartnerPlaceholder: boolean; // e.g., " / partner" or "/partner"
@@ -160,6 +161,7 @@ function parseParticipantContent(content: string): SkbParticipant {
   const c = content.trim();
   const hasCheck = /✅/.test(c);
   const hasAcc = /💯/.test(c);
+  const hasMoney = /💰/.test(c);
   const hasVideo = /🎥/.test(c);
   const hasStar = /\*/.test(c);
   const isPartnerPlaceholder =
@@ -167,7 +169,7 @@ function parseParticipantContent(content: string): SkbParticipant {
 
   // Remove markers and trailing star-notes for parsing names/community
   const stripped = c
-    .replace(/[✅💯🎥]/gu, "")
+    .replace(/[💯💰✅🎥]/gu, "")
     .replace(/\*.*$/, "")
     .trim();
 
@@ -185,6 +187,7 @@ function parseParticipantContent(content: string): SkbParticipant {
     hasAcc,
     hasVideo,
     hasStar,
+    hasMoney,
     isPartnerPlaceholder,
     leftName,
     rightName,
@@ -193,19 +196,19 @@ function parseParticipantContent(content: string): SkbParticipant {
 }
 
 function participantPriority(p: SkbParticipant): number {
-  // Sorting buckets as per rules:
-  // 0: ✅💯
-  // 1: 💯 (but not ✅)
-  // 2: 🎥 (but not covered above)
-  // 3: no sign
-  // 4: " / partner"
-  // 5: contains '*'
-  if (p.hasStar) return 5;
-  if (p.isPartnerPlaceholder) return 4;
-  if (p.hasCheck && p.hasAcc) return 0;
-  if (p.hasAcc) return 1;
+  // New sorting buckets (ascending priority):
+  // 0: ✅💰 (even if followed by *{comment})
+  // 1: ✅ (but not in bucket 0)
+  // 2: 🎥
+  // 3: others
+  // 4: "/partner" placeholder lines
+  // 5: entries with '*' comments
+  if (p.hasCheck && p.hasMoney) return 0;
+  if (p.hasCheck) return 1;
   if (p.hasVideo) return 2;
-  return 3;
+  if (!p.isPartnerPlaceholder && !p.hasStar) return 3; // others
+  if (p.isPartnerPlaceholder) return 4;
+  return 5; // starred entries
 }
 
 /** Sort only the numbered participant lines inside the provided main section text. */
@@ -230,32 +233,42 @@ export function sortSkbMainParticipants(main: string): string {
     })
     .map((p, idx) => ({ p, idx })); // keep stable index for stable sort
 
+  // Build community counts (normalized, case-insensitive) to sort by frequency desc
+  const communityKeyNorm = (p: SkbParticipant) =>
+    (p.community || "").trim().toLowerCase();
+
+  const communityCounts = new Map<string, number>();
+  for (const e of entries) {
+    const key = communityKeyNorm(e.p);
+    communityCounts.set(key, (communityCounts.get(key) || 0) + 1);
+  }
+
   entries.sort((a, b) => {
     const pa = participantPriority(a.p);
     const pb = participantPriority(b.p);
     if (pa !== pb) return pa - pb;
-    // Sort by community (A-Z, empty last)
-    const communityKey = (p: SkbParticipant) => {
-      const c = (p.community || "").trim().toLowerCase();
-      return c.length ? c : "\uFFFF";
-    };
-    const nameKey = (s?: string) => (s || "").trim().toLowerCase();
 
-    const ca = communityKey(a.p);
-    const cb = communityKey(b.p);
-    if (ca !== cb) return ca < cb ? -1 : 1;
+    // Inside section 0 (✅💰): starred ones go to the very top
+    if (pa === 0) {
+      if (a.p.hasStar !== b.p.hasStar) return a.p.hasStar ? -1 : 1;
+    }
 
-    // Then by left player name (A-Z)
-    const la = nameKey(a.p.leftName);
-    const lb = nameKey(b.p.leftName);
-    if (la !== lb) return la < lb ? -1 : 1;
+    // Sort by community frequency (desc). Empty community goes last.
+    const ka = communityKeyNorm(a.p);
+    const kb = communityKeyNorm(b.p);
 
-    // Then by right player name (A-Z)
-    const ra = nameKey(a.p.rightName);
-    const rb = nameKey(b.p.rightName);
-    if (ra !== rb) return ra < rb ? -1 : 1;
+    const aEmpty = ka.length === 0;
+    const bEmpty = kb.length === 0;
+    if (aEmpty !== bEmpty) return aEmpty ? 1 : -1;
 
-    // stable within the same bucket: preserve original order
+    const ca = communityCounts.get(ka) || 0;
+    const cb = communityCounts.get(kb) || 0;
+    if (ca !== cb) return cb - ca; // higher frequency first
+
+    // Tie-breaker: community name A–Z (empty already handled)
+    if (ka !== kb) return ka < kb ? -1 : 1;
+
+    // stable within the same bucket and community: preserve original order
     return a.idx - b.idx;
   });
 

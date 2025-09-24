@@ -35,7 +35,7 @@ function App() {
           </ul>
         </div>
 
-        <details className="text-left text-sm text-gray-500 mb-2">
+        {/* <details className="text-left text-sm text-gray-500 mb-2">
           <summary className="font-bold cursor-pointer">
             Aturan sorting yang digunakan:
           </summary>
@@ -66,7 +66,7 @@ function App() {
               </li>
             </ul>
           </div>
-        </details>
+        </details> */}
 
         <textarea
           className="w-full min-h-80 border-[1px] border-solid border-gray p-2 bg-white text-black"
