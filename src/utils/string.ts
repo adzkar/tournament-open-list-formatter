@@ -155,10 +155,12 @@ export type SkbParticipant = {
   leftName?: string;
   rightName?: string;
   community?: string;
+  notFullPaid?: boolean;
 };
 
 function parseParticipantContent(content: string): SkbParticipant {
   const c = content.trim();
+  const notFullPaid = /100K/.test(c);
   const hasCheck = /✅/.test(c);
   const hasAcc = /💯/.test(c);
   const hasMoney = /💰/.test(c);
@@ -183,6 +185,7 @@ function parseParticipantContent(content: string): SkbParticipant {
 
   return {
     original: c,
+    notFullPaid,
     hasCheck,
     hasAcc,
     hasVideo,
@@ -203,11 +206,12 @@ function participantPriority(p: SkbParticipant): number {
   // 3: others
   // 4: "/partner" placeholder lines
   // 5: entries with '*' comments
-  if (p.hasCheck && p.hasMoney) return 0;
-  if (p.hasCheck) return 1;
-  if (p.hasVideo) return 2;
-  if (!p.isPartnerPlaceholder && !p.hasStar) return 3; // others
-  if (p.isPartnerPlaceholder) return 4;
+  if (p.hasCheck && p.hasMoney && p.notFullPaid) return 0;
+  if (p.hasCheck && p.hasMoney) return 1;
+  if (p.hasCheck) return 2;
+  if (p.hasVideo) return 3;
+  if (!p.isPartnerPlaceholder && !p.hasStar) return 4; // others
+  if (p.isPartnerPlaceholder) return 5;
   return 5; // starred entries
 }
 
