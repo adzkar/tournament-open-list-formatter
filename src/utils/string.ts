@@ -223,7 +223,7 @@ function participantPriority(p: Participant): number {
 }
 
 /** Sort only the numbered participant lines inside the provided main section text. */
-export function sortSkbMainParticipants(main: string): string {
+export function sortMainParticipants(main: string): string {
   const lines = main.split("\n");
 
   // identify the first numbered item; keep anything before it (e.g., the title line)
@@ -298,7 +298,7 @@ export function sortSkbMainParticipants(main: string): string {
 export function processAndSortText(text: string): string {
   const { header, main, footer } = splitTextSections(text);
 
-  const sortedMain = sortSkbMainParticipants(main);
+  const sortedMain = sortMainParticipants(main);
   const parts = [] as string[];
   if (header.trim().length) parts.push(header.trim());
   if (sortedMain.trim().length) parts.push(sortedMain.trim());
