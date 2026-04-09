@@ -71,7 +71,7 @@ export function pasteFromClipboard() {
  * - main ends just before a line starting with "Note" (case-insensitive) if present,
  *   otherwise at the last numbered entry line like "84. ..."
  */
-export function splitSkbTextSections(text: string): {
+export function splitTextSections(text: string): {
   header: string;
   main: string;
   footer: string;
@@ -295,8 +295,8 @@ export function sortSkbMainParticipants(main: string): string {
 }
 
 /** High-level helper: split -> sort participants in main -> merge back */
-export function processAndSortSkbText(text: string): string {
-  const { header, main, footer } = splitSkbTextSections(text);
+export function processAndSortText(text: string): string {
+  const { header, main, footer } = splitTextSections(text);
 
   const sortedMain = sortSkbMainParticipants(main);
   const parts = [] as string[];

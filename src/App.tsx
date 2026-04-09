@@ -3,7 +3,7 @@ import "./App.css";
 import {
   copyToClipboard,
   pasteFromClipboard,
-  processAndSortSkbText,
+  processAndSortText,
 } from "./utils/string";
 import { getIsSafari } from "./utils/browser";
 
@@ -12,73 +12,48 @@ function App() {
   const [finalText, setFinalText] = useState("");
 
   const onProcess = () => {
-    const result = processAndSortSkbText(text);
+    const result = processAndSortText(text);
     setFinalText(result);
   };
 
   return (
-    <div className={`bg-[var(--white)] min-h-screen`}>
-      <div className="py-4 flex flex-col sm:max-w-[600px] w-[90%] mx-auto">
-        <div className="text-2xl font-bold mb-4 text-center text-[var(--dark-red)]">
-          Turnamen SKB Open List Formatter
+    <div className="bg-gray-50 min-h-screen">
+      <div className="py-8 flex flex-col sm:max-w-[600px] w-[90%] mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="text-2xl font-bold text-center text-blue-600 mb-1">
+            Turnamen Open List Formatter
+          </div>
+          <div className="h-px bg-blue-100 w-full" />
         </div>
 
-        <div className="text-left text-sm text-gray-500 mb-4">
+        {/* Instructions */}
+        <div className="text-left text-sm text-gray-500 mb-4 bg-blue-50 border-[1px] border-solid border-blue-100 rounded-lg p-3">
           Cara penggunaan:
-          <ul className="list-decimal list-inside">
-            <li>Paste teks list peserta dari halaman list di Turnamen SKB.</li>
+          <ul className="list-decimal list-inside mt-1 space-y-0.5">
+            <li>Paste teks list peserta dari halaman list di Turnamen.</li>
             <li>
-              Klik tombol <b>Process</b>.
+              Klik tombol{" "}
+              <span className="font-semibold text-blue-600">Proses</span>.
             </li>
-            <li>Teks sudah terformat sesuai dengan aturan Turnamen SKB.</li>
-            <li>Copy teks yang sudah terformat</li>
+            <li>Teks sudah terformat sesuai dengan aturan Turnamen.</li>
+            <li>Copy teks yang sudah terformat.</li>
           </ul>
         </div>
 
-        {/* <details className="text-left text-sm text-gray-500 mb-2">
-          <summary className="font-bold cursor-pointer">
-            Aturan sorting yang digunakan:
-          </summary>
-          <div className="mt-2">
-            <ul className="list-decimal list-inside">
-              <li>
-                Pertama, diurutkan berdasarkan emoji yang digunakan. Untuk
-                konsistensi, emoji yang digunakan adalah:
-                <ul className="list-disc list-inside pl-4">
-                  <li>✅ 💯 memiliki checklist & acc</li>
-                  <li>💯 memiliki acc</li>
-                  <li>🎥 memiliki video</li>
-                  <li>tanpa emoji</li>
-                  <li>pemain tanpa partner</li>
-                  <li>pemain yang diberi tanda bintang</li>
-                </ul>
-              </li>
-              <li>Setelah itu dikelompokan berdasarkan nama komunitas</li>
-              <li>
-                Di setiap nama komunitas yang sudah ada, diurutkan berdasarkan
-                nama pemain. Contoh:
-                <ul className="list-disc list-inside pl-4">
-                  <li>A / A (nama komunitas)</li>
-                  <li>A / B (nama komunitas)</li>
-                  <li>B / A (nama komunitas)</li>
-                  <li>B / B (nama komunitas)</li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </details> */}
-
+        {/* Textarea */}
         <textarea
-          className="w-full min-h-80 border-[1px] border-solid border-gray p-2 bg-white text-black"
+          className="w-full min-h-80 border-[1px] border-solid border-gray-300 rounded-lg p-3 bg-white text-black text-sm focus:outline-none focus:border-blue-400 transition-colors duration-150"
           placeholder="Paste disini listnya"
           value={text}
           onChange={(e) => setText(e.target.value)}
           autoFocus
-        ></textarea>
+        />
 
-        <div className="flex items-center justify-between space-x-2">
+        {/* Secondary actions */}
+        <div className="flex items-center justify-between gap-2 mt-2">
           <button
-            className="w-full py-2 mt-2 bg-[var(--salmon-pink)] text-[var(--dark-red)] hover:text-white font-bold hover:bg-[var(--orange-red)] transition-all"
+            className="w-full py-2 border-[1px] border-solid border-gray-300 rounded-lg text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 bg-white transition-colors duration-150 cursor-pointer"
             onClick={() => {
               setText("");
               setFinalText("");
@@ -90,7 +65,7 @@ function App() {
 
           {!getIsSafari() && (
             <button
-              className="w-full py-2 mt-2 bg-[var(--salmon-pink)] text-[var(--dark-red)] hover:text-white font-bold hover:bg-[var(--orange-red)] transition-all"
+              className="w-full py-2 border-[1px] border-solid border-gray-300 rounded-lg text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 bg-white transition-colors duration-150 cursor-pointer"
               onClick={() => {
                 pasteFromClipboard().then((res) => {
                   setText(res ?? "");
@@ -103,8 +78,9 @@ function App() {
           )}
         </div>
 
+        {/* Primary action */}
         <button
-          className={`"w-full py-2 mt-2 bg-[var(--dark-red)] text-white font-bold hover:bg-[var(--orange-red)] transition-all ${text.length === 0 ? "opacity-70 cursor-not-allowed" : ""}`}
+          className={`w-full py-2 mt-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-150 cursor-pointer ${text.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={text.length === 0}
           onClick={onProcess}
         >
@@ -112,12 +88,13 @@ function App() {
           Proses
         </button>
 
+        {/* Result */}
         {finalText.length > 0 && (
           <>
-            <div className="border-[0px] border-t-[1px] border-solid border-gray p-2 mt-6" />
+            <div className="h-px bg-gray-200 mt-8 mb-4" />
 
             <button
-              className={`"w-full py-2 mt-2 bg-[var(--dark-red)] text-white font-bold hover:bg-[var(--orange-red)] transition-all mb-4 ${text.length === 0 ? "opacity-70 cursor-not-allowed" : ""}`}
+              className={`w-full py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-150 mb-4 cursor-pointer ${text.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={text.length === 0}
               onClick={() => copyToClipboard(finalText)}
             >
@@ -126,7 +103,7 @@ function App() {
             </button>
 
             <div
-              className="bg-[var(--pink-pale)] p-2 mt-6 text-black"
+              className="bg-white border-[1px] border-solid border-gray-200 rounded-lg p-3 text-sm text-black"
               style={{ whiteSpace: "pre-wrap" }}
             >
               {finalText}
