@@ -1,0 +1,101 @@
+<svg width="100%" viewBox="0 0 680 640" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Sort logic detail</title>
+  <desc>Detail flowchart of sortMainParticipants: strip numbering, parse each line with parseParticipantContent extracting eventCode and emoji markers, build community frequency map, sort by eventCode then by priority bucket then by community frequency, renumber and rejoin.</desc>
+
+  <style>
+    text { font-family: ui-sans-serif, system-ui, sans-serif; fill: #1a1a1a; }
+    .th  { font-size: 14px; font-weight: 600; }
+    .ts  { font-size: 12px; fill: #555; }
+    .node-gray  { fill: #f3f3f3; stroke: #bbb; }
+    .node-blue  { fill: #e8f0fb; stroke: #5585c8; }
+    .node-purple{ fill: #eeecfd; stroke: #7b72d4; }
+    .node-amber { fill: #fef3da; stroke: #c49020; }
+    .node-teal  { fill: #e0f5ee; stroke: #3aaa7e; }
+    .arr { stroke: #888; stroke-width: 1.5; fill: none; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Entry -->
+  <rect x="170" y="30" width="340" height="44" rx="8" class="node-purple" stroke-width="0.5"/>
+  <text class="th" x="340" y="57" text-anchor="middle">main section text</text>
+
+  <line x1="340" y1="74" x2="340" y2="108" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- Split title -->
+  <rect x="190" y="108" width="300" height="56" rx="8" class="node-gray" stroke-width="0.5"/>
+  <text class="th" x="340" y="130" text-anchor="middle">Split title from entries</text>
+  <text class="ts" x="340" y="150" text-anchor="middle">Keep lines before first N. as header</text>
+
+  <line x1="340" y1="164" x2="340" y2="198" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- parseParticipantContent -->
+  <rect x="170" y="198" width="340" height="56" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="340" y="220" text-anchor="middle">parseParticipantContent()</text>
+  <text class="ts" x="340" y="240" text-anchor="middle">Per entry: eventCode, names, community, flags</text>
+
+  <!-- Fan to parsed fields -->
+  <path d="M340 254 L105 278" class="arr" marker-end="url(#arrow)"/>
+  <path d="M340 254 L250 278" class="arr" marker-end="url(#arrow)"/>
+  <path d="M340 254 L395 278" class="arr" marker-end="url(#arrow)"/>
+  <path d="M340 254 L560 278" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- Parsed field boxes -->
+  <rect x="40" y="278" width="130" height="44" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="105" y="295" text-anchor="middle">eventCode</text>
+  <text class="ts" x="105" y="312" text-anchor="middle">GC21, GP22…</text>
+
+  <rect x="185" y="278" width="130" height="44" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="250" y="295" text-anchor="middle">community</text>
+  <text class="ts" x="250" y="312" text-anchor="middle">(Glory), (BTN)…</text>
+
+  <rect x="330" y="278" width="130" height="44" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="395" y="295" text-anchor="middle">emoji flags</text>
+  <text class="ts" x="395" y="312" text-anchor="middle">hasCheck, hasMoney…</text>
+
+  <rect x="475" y="278" width="165" height="44" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="557" y="295" text-anchor="middle">isPartnerPlaceholder</text>
+  <text class="ts" x="557" y="312" text-anchor="middle">hasStar, notFullPaid</text>
+
+  <!-- community freq map -->
+  <line x1="340" y1="322" x2="340" y2="356" class="arr" marker-end="url(#arrow)"/>
+
+  <rect x="190" y="356" width="300" height="44" rx="8" class="node-gray" stroke-width="0.5"/>
+  <text class="th" x="340" y="373" text-anchor="middle">Build community frequency map</text>
+  <text class="ts" x="340" y="390" text-anchor="middle">Map&lt;string, count&gt; across all entries</text>
+
+  <line x1="340" y1="400" x2="340" y2="434" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- Sort comparator -->
+  <rect x="170" y="434" width="340" height="56" rx="8" class="node-amber" stroke-width="0.5"/>
+  <text class="th" x="340" y="456" text-anchor="middle">Sort comparator</text>
+  <text class="ts" x="340" y="476" text-anchor="middle">3-tier: eventCode → priority → community</text>
+
+  <!-- Fan to tier boxes -->
+  <path d="M340 490 L125 514" class="arr" marker-end="url(#arrow)"/>
+  <path d="M340 490 L340 514" class="arr" marker-end="url(#arrow)"/>
+  <path d="M340 490 L555 514" class="arr" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="514" width="170" height="56" rx="8" class="node-amber" stroke-width="0.5"/>
+  <text class="th" x="125" y="536" text-anchor="middle">1. eventCode A–Z</text>
+  <text class="ts" x="125" y="555" text-anchor="middle">No code sorts last</text>
+
+  <rect x="225" y="514" width="230" height="56" rx="8" class="node-amber" stroke-width="0.5"/>
+  <text class="th" x="340" y="536" text-anchor="middle">2. Priority bucket</text>
+  <text class="ts" x="340" y="555" text-anchor="middle">✅💰 > ✅ > 🎥 > other > partner</text>
+
+  <rect x="470" y="514" width="170" height="56" rx="8" class="node-amber" stroke-width="0.5"/>
+  <text class="th" x="555" y="536" text-anchor="middle">3. Community freq</text>
+  <text class="ts" x="555" y="555" text-anchor="middle">Higher count first</text>
+
+  <!-- Renumber + output -->
+  <line x1="340" y1="570" x2="340" y2="604" class="arr" marker-end="url(#arrow)"/>
+
+  <rect x="200" y="604" width="280" height="44" rx="8" class="node-teal" stroke-width="0.5"/>
+  <text class="th" x="340" y="621" text-anchor="middle">Renumber + rejoin</text>
+  <text class="ts" x="340" y="638" text-anchor="middle">1. … 2. … sequential output</text>
+</svg>
