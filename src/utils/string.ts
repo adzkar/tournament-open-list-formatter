@@ -39,7 +39,7 @@ export function copyToClipboard(text: string): void {
       throw new Error("execCommand copy failed");
     } catch {
       window.alert(
-        "Gagal menyalin. Silakan pilih teks dan salin secara manual."
+        "Gagal menyalin. Silakan pilih teks dan salin secara manual.",
       );
     }
   })();
@@ -144,21 +144,22 @@ export function splitSkbTextSections(text: string): {
   return { header, main, footer };
 }
 
-export type SkbParticipant = {
-  original: string; // content without leading numbering
-  hasCheck: boolean; // ✅
-  hasAcc: boolean; // 💯
-  hasMoney: boolean; // 💰
-  hasVideo: boolean; // 🎥
-  hasStar: boolean; // contains '*'
-  isPartnerPlaceholder: boolean; // e.g., " / partner" or "/partner"
+export type Participant = {
+  original: string;
+  hasCheck: boolean;
+  hasAcc: boolean;
+  hasMoney: boolean;
+  hasVideo: boolean;
+  hasStar: boolean;
+  isPartnerPlaceholder: boolean;
   leftName?: string;
   rightName?: string;
   community?: string;
   notFullPaid?: boolean;
+  eventCode?: string; // Generic field for any event code (GC21, GP22, etc.)
 };
 
-function parseParticipantContent(content: string): SkbParticipant {
+function parseParticipantContent(content: string): Participant {
   const c = content.trim();
   const notFullPaid = /100K/.test(c);
   const hasCheck = /✅/.test(c);
@@ -169,14 +170,18 @@ function parseParticipantContent(content: string): SkbParticipant {
   const isPartnerPlaceholder =
     /\b\/\s*partner\b/i.test(c) || /\bpartner\b\s*\/?$/i.test(c);
 
-  // Remove markers and trailing star-notes for parsing names/community
+  // Extract any event code pattern (GC21, GP22, GW11, etc.)
+  const eventCodeMatch = c.match(/^```([A-Z]{2}\d{2})```\s+/);
+  const eventCode = eventCodeMatch ? eventCodeMatch[1] : undefined;
+
+  // Remove event code, markers and trailing star-notes for parsing names/community
   const stripped = c
+    .replace(/^```[A-Z]{2}\d{2}```\s+/, "") // Remove any event code prefix
     .replace(/[💯💰✅🎥]/gu, "")
     .replace(/\*.*$/, "")
     .trim();
 
   // Try to extract names and optional community in parentheses
-  // e.g., "Adhitriya / Aziz N (badmintul)"
   const m = stripped.match(/^(.+?)\s*\/\s*(.+?)(?:\s*\(([^)]+)\))?\s*$/);
 
   const leftName = m ? m[1].trim() : undefined;
@@ -195,24 +200,26 @@ function parseParticipantContent(content: string): SkbParticipant {
     leftName,
     rightName,
     community,
+    eventCode, // Add the new field
   };
 }
 
-function participantPriority(p: SkbParticipant): number {
-  // New sorting buckets (ascending priority):
-  // 0: ✅💰 (even if followed by *{comment})
-  // 1: ✅ (but not in bucket 0)
-  // 2: 🎥
-  // 3: others
-  // 4: "/partner" placeholder lines
-  // 5: entries with '*' comments
+function participantPriority(p: Participant): number {
+  // Sorting buckets (ascending = higher priority):
+  // 0: ✅💰 not-full-paid
+  // 1: ✅💰
+  // 2: ✅
+  // 3: 🎥
+  // 4: others
+  // 5: "/partner" placeholder lines
+  // 6: entries with '*' comments
   if (p.hasCheck && p.hasMoney && p.notFullPaid) return 0;
   if (p.hasCheck && p.hasMoney) return 1;
   if (p.hasCheck) return 2;
   if (p.hasVideo) return 3;
   if (!p.isPartnerPlaceholder && !p.hasStar) return 4; // others
   if (p.isPartnerPlaceholder) return 5;
-  return 5; // starred entries
+  return 6; // starred entries
 }
 
 /** Sort only the numbered participant lines inside the provided main section text. */
@@ -238,7 +245,7 @@ export function sortSkbMainParticipants(main: string): string {
     .map((p, idx) => ({ p, idx })); // keep stable index for stable sort
 
   // Build community counts (normalized, case-insensitive) to sort by frequency desc
-  const communityKeyNorm = (p: SkbParticipant) =>
+  const communityKeyNorm = (p: Participant) =>
     (p.community || "").trim().toLowerCase();
 
   const communityCounts = new Map<string, number>();
@@ -248,11 +255,17 @@ export function sortSkbMainParticipants(main: string): string {
   }
 
   entries.sort((a, b) => {
+    // Primary: group by eventCode alphabetically. Entries without a code sort last.
+    const ca = a.p.eventCode ?? "\uFFFF";
+    const cb = b.p.eventCode ?? "\uFFFF";
+    if (ca !== cb) return ca < cb ? -1 : 1;
+
+    // Secondary: existing priority tiers within the same code group
     const pa = participantPriority(a.p);
     const pb = participantPriority(b.p);
     if (pa !== pb) return pa - pb;
 
-    // Inside section 0 (✅💰): starred ones go to the very top
+    // Inside the top priority bucket: starred ones go to the very top
     if (pa === 0) {
       if (a.p.hasStar !== b.p.hasStar) return a.p.hasStar ? -1 : 1;
     }
@@ -265,9 +278,9 @@ export function sortSkbMainParticipants(main: string): string {
     const bEmpty = kb.length === 0;
     if (aEmpty !== bEmpty) return aEmpty ? 1 : -1;
 
-    const ca = communityCounts.get(ka) || 0;
-    const cb = communityCounts.get(kb) || 0;
-    if (ca !== cb) return cb - ca; // higher frequency first
+    const commA = communityCounts.get(ka) || 0;
+    const commB = communityCounts.get(kb) || 0;
+    if (commA !== commB) return commB - commA; // higher frequency first
 
     // Tie-breaker: community name A–Z (empty already handled)
     if (ka !== kb) return ka < kb ? -1 : 1;
