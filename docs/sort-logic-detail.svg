@@ -1,4 +1,4 @@
-<svg width="100%" viewBox="0 0 680 640" xmlns="http://www.w3.org/2000/svg" role="img">
+<svg width="100%" viewBox="0 0 680 700" xmlns="http://www.w3.org/2000/svg" role="img">
   <title>Sort logic detail</title>
   <desc>Detail flowchart of sortMainParticipants: strip numbering, parse each line with parseParticipantContent extracting eventCode and emoji markers, build community frequency map, sort by eventCode then by priority bucket then by community frequency, renumber and rejoin.</desc>
 

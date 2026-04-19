@@ -1,4 +1,4 @@
-<svg width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg" role="img">
+<svg width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" role="img">
   <title>String parsing pipeline overview</title>
   <desc>High-level flow of processAndSortText: raw text goes through splitTextSections producing header, main, and footer; main goes through sortMainParticipants; all three parts are merged into the final output.</desc>
 
@@ -11,7 +11,6 @@
     .node-purple{ fill: #eeecfd; stroke: #7b72d4; }
     .node-teal  { fill: #e0f5ee; stroke: #3aaa7e; }
     .arr { stroke: #888; stroke-width: 1.5; fill: none; }
-    marker path { stroke: #888; }
   </style>
 
   <defs>
@@ -20,64 +19,69 @@
     </marker>
   </defs>
 
-  <!-- Input -->
+  <!-- Raw text input -->
   <rect x="215" y="30" width="250" height="44" rx="22" class="node-gray" stroke-width="0.5"/>
-  <text class="th" x="340" y="57" text-anchor="middle">Raw text input</text>
+  <text class="th" x="340" y="52" text-anchor="middle" dominant-baseline="central">Raw text input</text>
 
-  <line x1="340" y1="74" x2="340" y2="110" class="arr" marker-end="url(#arrow)"/>
+  <line x1="340" y1="74" x2="340" y2="108" class="arr" marker-end="url(#arrow)"/>
 
   <!-- splitTextSections -->
-  <rect x="170" y="110" width="340" height="56" rx="8" class="node-blue" stroke-width="0.5"/>
-  <text class="th" x="340" y="132" text-anchor="middle">splitTextSections()</text>
-  <text class="ts" x="340" y="152" text-anchor="middle">Normalize, find LIST PESERTA + Note markers</text>
+  <rect x="170" y="108" width="340" height="56" rx="8" class="node-blue" stroke-width="0.5"/>
+  <text class="th" x="340" y="129" text-anchor="middle" dominant-baseline="central">splitTextSections()</text>
+  <text class="ts" x="340" y="150" text-anchor="middle" dominant-baseline="central">Normalize, find LIST PESERTA + Note markers</text>
 
-  <!-- Three branches -->
-  <path d="M200 166 L200 220" class="arr" marker-end="url(#arrow)"/>
-  <line x1="340" y1="166" x2="340" y2="220" class="arr" marker-end="url(#arrow)"/>
-  <path d="M480 166 L480 220" class="arr" marker-end="url(#arrow)"/>
-  <path d="M170 138 L200 138 L200 166" fill="none" stroke="#bbb" stroke-width="0.5"/>
-  <path d="M510 138 L480 138 L480 166" fill="none" stroke="#bbb" stroke-width="0.5"/>
+  <!-- Fan-out arrows: centre of splitTextSections box bottom = x=340, y=164 -->
+  <!-- header centre x=150, main centre x=340, footer centre x=530 -->
+  <!-- L-bend left: down to y=190, then left to x=150, then down to y=218 -->
+  <path d="M340 164 L340 190 L150 190 L150 218" class="arr" marker-end="url(#arrow)"/>
+  <!-- straight down for main -->
+  <line x1="340" y1="164" x2="340" y2="218" class="arr" marker-end="url(#arrow)"/>
+  <!-- L-bend right: down to y=190, then right to x=530, then down to y=218 -->
+  <path d="M340 164 L340 190 L530 190 L530 218" class="arr" marker-end="url(#arrow)"/>
 
-  <!-- header -->
-  <rect x="60" y="220" width="280" height="44" rx="8" class="node-gray" stroke-width="0.5"/>
-  <text class="th" x="200" y="237" text-anchor="middle">header</text>
-  <text class="ts" x="200" y="254" text-anchor="middle">Text before list</text>
+  <!-- header: x=70, w=160, centre=150 -->
+  <rect x="70" y="218" width="160" height="56" rx="8" class="node-gray" stroke-width="0.5"/>
+  <text class="th" x="150" y="239" text-anchor="middle" dominant-baseline="central">header</text>
+  <text class="ts" x="150" y="260" text-anchor="middle" dominant-baseline="central">Text before list</text>
 
-  <!-- main -->
-  <rect x="220" y="220" width="240" height="44" rx="8" class="node-purple" stroke-width="0.5"/>
-  <text class="th" x="340" y="237" text-anchor="middle">main</text>
-  <text class="ts" x="340" y="254" text-anchor="middle">Numbered participant lines</text>
+  <!-- main: x=260, w=160, centre=340 -->
+  <rect x="260" y="218" width="160" height="56" rx="8" class="node-purple" stroke-width="0.5"/>
+  <text class="th" x="340" y="239" text-anchor="middle" dominant-baseline="central">main</text>
+  <text class="ts" x="340" y="260" text-anchor="middle" dominant-baseline="central">Numbered entries</text>
 
-  <!-- footer -->
-  <rect x="340" y="220" width="280" height="44" rx="8" class="node-gray" stroke-width="0.5"/>
-  <text class="th" x="480" y="237" text-anchor="middle">footer</text>
-  <text class="ts" x="480" y="254" text-anchor="middle">Notes after list</text>
+  <!-- footer: x=450, w=160, centre=530 -->
+  <rect x="450" y="218" width="160" height="56" rx="8" class="node-gray" stroke-width="0.5"/>
+  <text class="th" x="530" y="239" text-anchor="middle" dominant-baseline="central">footer</text>
+  <text class="ts" x="530" y="260" text-anchor="middle" dominant-baseline="central">Notes after list</text>
 
   <!-- main → sortMainParticipants -->
-  <line x1="340" y1="264" x2="340" y2="310" class="arr" marker-end="url(#arrow)"/>
+  <line x1="340" y1="274" x2="340" y2="318" class="arr" marker-end="url(#arrow)"/>
 
   <!-- sortMainParticipants -->
-  <rect x="170" y="310" width="340" height="56" rx="8" class="node-purple" stroke-width="0.5"/>
-  <text class="th" x="340" y="332" text-anchor="middle">sortMainParticipants()</text>
-  <text class="ts" x="340" y="352" text-anchor="middle">Parse, sort, renumber entries</text>
+  <rect x="170" y="318" width="340" height="56" rx="8" class="node-purple" stroke-width="0.5"/>
+  <text class="th" x="340" y="339" text-anchor="middle" dominant-baseline="central">sortMainParticipants()</text>
+  <text class="ts" x="340" y="360" text-anchor="middle" dominant-baseline="central">Parse, sort, renumber entries</text>
 
-  <line x1="340" y1="366" x2="340" y2="400" class="arr" marker-end="url(#arrow)"/>
+  <line x1="340" y1="374" x2="340" y2="408" class="arr" marker-end="url(#arrow)"/>
 
   <!-- sorted main -->
-  <rect x="220" y="400" width="240" height="44" rx="8" class="node-purple" stroke-width="0.5"/>
-  <text class="th" x="340" y="417" text-anchor="middle">sorted main</text>
-  <text class="ts" x="340" y="434" text-anchor="middle">Grouped + prioritised list</text>
+  <rect x="260" y="408" width="160" height="56" rx="8" class="node-purple" stroke-width="0.5"/>
+  <text class="th" x="340" y="429" text-anchor="middle" dominant-baseline="central">sorted main</text>
+  <text class="ts" x="340" y="450" text-anchor="middle" dominant-baseline="central">Grouped + prioritised</text>
 
-  <!-- Three parts converge -->
-  <path d="M200 264 L200 470 L300 470" fill="none" class="arr" marker-end="url(#arrow)"/>
-  <line x1="340" y1="444" x2="340" y2="490" class="arr" marker-end="url(#arrow)"/>
-  <path d="M480 264 L480 470 L380 470" fill="none" class="arr" marker-end="url(#arrow)"/>
+  <!-- Converge arrows into merge box (y=510) -->
+  <!-- header: from bottom of header (x=150, y=274), down to y=500, right to x=300, down to y=510 -->
+  <path d="M150 274 L150 500 L300 500 L300 510" class="arr" marker-end="url(#arrow)"/>
+  <!-- sorted main: straight down -->
+  <line x1="340" y1="464" x2="340" y2="510" class="arr" marker-end="url(#arrow)"/>
+  <!-- footer: from bottom of footer (x=530, y=274), down to y=500, left to x=380, down to y=510 -->
+  <path d="M530 274 L530 500 L380 500 L380 510" class="arr" marker-end="url(#arrow)"/>
 
   <!-- Merge -->
-  <rect x="170" y="490" width="340" height="56" rx="8" class="node-teal" stroke-width="0.5"/>
-  <text class="th" x="340" y="512" text-anchor="middle">Merge non-empty parts</text>
-  <text class="ts" x="340" y="532" text-anchor="middle">Join header + sorted main + footer</text>
+  <rect x="170" y="510" width="340" height="56" rx="8" class="node-teal" stroke-width="0.5"/>
+  <text class="th" x="340" y="531" text-anchor="middle" dominant-baseline="central">Merge non-empty parts</text>
+  <text class="ts" x="340" y="552" text-anchor="middle" dominant-baseline="central">Join header + sorted main + footer</text>
 
-  <line x1="340" y1="546" x2="340" y2="566" class="arr" marker-end="url(#arrow)"/>
-  <text class="ts" x="340" y="576" text-anchor="middle">Final formatted text</text>
+  <line x1="340" y1="566" x2="340" y2="590" class="arr" marker-end="url(#arrow)"/>
+  <text class="ts" x="340" y="606" text-anchor="middle" dominant-baseline="central">Final formatted text</text>
 </svg>
